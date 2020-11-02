@@ -2,28 +2,31 @@ package main
 
 import (
 	"fmt"
-	ru "github.com/go-playground/locales/ru_RU"
+
+	english "github.com/go-playground/locales/en"
 	ut "github.com/go-playground/universal-translator"
-	validator "github.com/go-playground/validator/v10"
-	en_translations "github.com/go-playground/validator/v10/translations/en"
+	"github.com/go-playground/validator/v10"
+	ru_translations "github.com/go-playground/validator/v10/translations/ru"
 )
 var (
 	uni      *ut.UniversalTranslator
 	validate *validator.Validate
 )
 func main()  {
-	ru := ru.New()
-	uni = ut.New(ru, ru)
+	en := english.New()
+	uni := ut.New(en, en)
 	trans, _ := uni.GetTranslator("ru")
 
-	validate = validator.New()
-	en_translations.RegisterDefaultTranslations(validate, trans)
-	err := validate.Var("12","required,min=3")
+	validate := validator.New()
+	ru_translations.RegisterDefaultTranslations(validate, trans)
+
+	myVar := "12"
+	err := validate.Var(myVar,"required,min=3")
 	if err != nil {
 		errs := err.(validator.ValidationErrors)
-
+		fmt.Println(errs)
 		for _, e := range errs {
-			fmt.Errorf(e.Translate(trans))
+			fmt.Printf("%s\n",e.Translate(trans))
 		}
 	}
 
