@@ -7,23 +7,23 @@ import (
 	validator "github.com/go-playground/validator/v10"
 	en_translations "github.com/go-playground/validator/v10/translations/en"
 )
-var (
-	uni      *ut.UniversalTranslator
-	validate *validator.Validate
-)
+
 func main()  {
+	var uni      *ut.UniversalTranslator
 	ru := ru.New()
 	uni = ut.New(ru, ru)
 	trans, _ := uni.GetTranslator("ru")
 
-	validate = validator.New()
+	validate := validator.New()
 	en_translations.RegisterDefaultTranslations(validate, trans)
 	err := validate.Var("12","required,min=3")
 	if err != nil {
-		errs := err.(validator.ValidationErrors)
+		if _, ok := err.(*validator.InvalidValidationError); ok {
+			fmt.Errorf("value: %s", err)
+		}
 
-		for _, e := range errs {
-			fmt.Errorf(e.Translate(trans))
+		for _, err := range err.(validator.ValidationErrors) {
+			fmt.Errorf("%s",err.Translate(trans))
 		}
 	}
 
